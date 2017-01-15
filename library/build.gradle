@@ -1,5 +1,24 @@
 apply plugin: 'com.android.library'
 
+apply plugin: 'com.novoda.bintray-release'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.4'
+    }
+}
+publish {
+    userOrg = 'travissuban'
+    groupId = 'com.github.travissuban'
+    artifactId = 'recyclerview-listadapter'
+    publishVersion = '0.1.1'
+    licences = ['MIT']
+    desc = 'A simple list adapter with item click support.'
+    website = 'https://github.com/travissuban/recyclerview-listadapter'
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "24.0.3"
@@ -22,5 +41,5 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:recyclerview-v7:25.0.0'
+    provided 'com.android.support:recyclerview-v7:25.1.0'
 }

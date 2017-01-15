@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "24.0.3"
     defaultConfig {
-        applicationId "com.github.travissuban.recyclerviewlistadapter"
+        applicationId "com.github.travissuban.recyclerviewlistadapter.sample"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
@@ -20,5 +20,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile project(':library')
 }
