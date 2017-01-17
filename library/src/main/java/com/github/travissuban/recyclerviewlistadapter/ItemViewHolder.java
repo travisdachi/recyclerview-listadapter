@@ -36,7 +36,7 @@ public abstract class ItemViewHolder<T, VH extends ItemViewHolder> extends Recyc
     }
 
     /**
-     * You shouldn't have to call this. The {@link RecycleViewListAdapter} sets this for you.
+     * You shouldn't have to call this. The {@link RecycleViewListAdapter} set this up for you.
      *
      * @param listener the listener
      */
@@ -50,7 +50,4 @@ public abstract class ItemViewHolder<T, VH extends ItemViewHolder> extends Recyc
         });
     }
 
-    OnItemClickListener<T, VH> getOnItemClickListener() {
-        return onItemClickListener;
-    }
 }

@@ -7,24 +7,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class RecycleViewListAdapter<T, VH extends ItemViewHolder<T, VH>> extends RecyclerView.Adapter<VH> {
 
-    private List<T> list;
+    protected List<T> list = new ArrayList<>();
     protected OnItemClickListener<T, VH> onItemClickListener;
-    private DiffUtil.Callback diffUtilCallback;
-    private boolean diffDetectMove;
+    protected DiffCalculator<T> diffCalculator;
 
     /**
-     * Instantiates a new {@link RecycleViewListAdapter}
-     *
-     * @param list                the list
-     * @param onItemClickListener if you want to listen to the click event
+     * @param items Initial list of items, leave it null if you don't want to initialize items.
+     *              Keep in mind that {@link RecycleViewListAdapter} keep the items in its own internal List<T>
      */
-    public RecycleViewListAdapter(@NonNull List<T> list, @Nullable OnItemClickListener<T, VH> onItemClickListener) {
-        this.list = list;
+    public RecycleViewListAdapter(@Nullable List<T> items, @Nullable OnItemClickListener<T, VH> onItemClickListener, @Nullable DiffCalculator<T> diffCalculator) {
         this.onItemClickListener = onItemClickListener;
+        this.diffCalculator = diffCalculator;
+        if (items != null) {
+            this.list.addAll(items);
+        }
     }
 
     @Override
@@ -34,12 +35,6 @@ public abstract class RecycleViewListAdapter<T, VH extends ItemViewHolder<T, VH>
         return vh;
     }
 
-    /**
-     * @param parent   the parent
-     * @param viewType the viewType
-     * @param inflater the inflater
-     * @return your view holder
-     */
     protected abstract VH onCreateViewHolder(ViewGroup parent, int viewType, LayoutInflater inflater);
 
     @Override
@@ -48,11 +43,6 @@ public abstract class RecycleViewListAdapter<T, VH extends ItemViewHolder<T, VH>
         onBindViewHolder(holder, position, holder.item);
     }
 
-    /**
-     * @param holder   your view holder
-     * @param position the position
-     * @param item     the item, the same one as {@link ItemViewHolder#item}
-     */
     protected abstract void onBindViewHolder(@NonNull VH holder, int position, T item);
 
     @Override
@@ -60,47 +50,20 @@ public abstract class RecycleViewListAdapter<T, VH extends ItemViewHolder<T, VH>
         return list.size();
     }
 
-    public List<T> getList() {
-        return list;
+    public List<T> getItems() {
+        return new ArrayList<>(list);
     }
 
-    /**
-     * Replaces the list.
-     * <p>
-     * See also {@link RecycleViewListAdapter#setDiffUtil(DiffUtil.Callback, boolean)}.
-     *
-     * @param newList the new list
-     */
-    public void setList(List<T> newList) {
-        if (diffUtilCallback == null) {
-            this.list = newList;
-            notifyDataSetChanged();
-        } else {
-            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffUtilCallback, diffDetectMove);
-            this.list = newList;
+    public void setItems(List<T> newList) {
+        if (diffCalculator != null) {
+            DiffUtil.DiffResult diffResult = diffCalculator.getDiffResult(list, newList);
+            list.clear();
+            list.addAll(newList);
             diffResult.dispatchUpdatesTo(this);
+        } else {
+            list.clear();
+            list.addAll(newList);
+            notifyDataSetChanged();
         }
-    }
-
-    /**
-     * Add items and call {@link RecycleViewListAdapter#notifyItemRangeInserted(int, int)}
-     *
-     * @param items the items
-     */
-    public void addItems(@NonNull List<T> items) {
-        int oldSize = getItemCount();
-        this.list.addAll(items);
-        notifyItemRangeInserted(oldSize, items.size());
-    }
-
-    /**
-     * Just pass along the DiffUtil stuffs when you call {@link RecycleViewListAdapter#setList(List)}
-     *
-     * @param diffUtilCallback the diff util callback
-     * @param diffDetectMove   the diff detect move
-     */
-    public void setDiffUtil(DiffUtil.Callback diffUtilCallback, boolean diffDetectMove) {
-        this.diffUtilCallback = diffUtilCallback;
-        this.diffDetectMove = diffDetectMove;
     }
 }
